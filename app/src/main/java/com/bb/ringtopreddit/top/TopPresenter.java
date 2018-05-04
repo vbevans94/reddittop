@@ -55,8 +55,6 @@ public class TopPresenter implements TopContract.Presenter {
         if (loadedData.size() < MAX_ITEMS_COUNT) {
             view.showProgress();
             disposable.add(topRepo.getLinks(lastName)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::onSuccess, this::onError));
         }
     }
@@ -84,8 +82,8 @@ public class TopPresenter implements TopContract.Presenter {
             return;
         }
 
-        view.showError(R.string.error_loading_data);
         view.hideProgress();
+        view.showError(R.string.error_loading_data);
     }
 
     @Override

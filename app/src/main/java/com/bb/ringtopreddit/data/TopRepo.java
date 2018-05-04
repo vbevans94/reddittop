@@ -22,7 +22,9 @@ import javax.inject.Singleton;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 @Singleton
 public class TopRepo {
@@ -57,6 +59,8 @@ public class TopRepo {
                         preview.getImages().get(0).getSource().setTitle(link.getTitle());
                     }
                 })
-                .toList();
+                .toList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 }
