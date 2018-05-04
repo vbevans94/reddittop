@@ -40,7 +40,7 @@ public class TopRepo {
         this.apiService = apiService;
     }
 
-    public Single<List<RedditLink>> getLinks(String lastName) {
+    public Single<List<RedditLink>> getPopularFromLastDay(String lastName) {
         return apiService.topPopular("day", lastName, 10)
                 .flatMap((Function<Listing, ObservableSource<LinkItem>>) listing -> Observable.fromIterable(listing.getData().getChildren()))
                 .map(LinkItem::getData)

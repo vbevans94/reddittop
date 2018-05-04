@@ -14,9 +14,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
 
 @Singleton
 public class TopPresenter implements TopContract.Presenter {
@@ -54,7 +52,7 @@ public class TopPresenter implements TopContract.Presenter {
 
         if (loadedData.size() < MAX_ITEMS_COUNT) {
             view.showProgress();
-            disposable.add(topRepo.getLinks(lastName)
+            disposable.add(topRepo.getPopularFromLastDay(lastName)
                     .subscribe(this::onSuccess, this::onError));
         }
     }

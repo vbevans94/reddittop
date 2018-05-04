@@ -9,14 +9,9 @@ import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.concurrent.Callable;
 
 import io.reactivex.Single;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -40,24 +35,24 @@ public class TopPresenterTest {
 
     @Test
     public void takeView_failedToLoad_shouldShowError() {
-        when(mockRepo.getLinks(isNull())).thenReturn(Single.error(new Exception()));
+        when(mockRepo.getPopularFromLastDay(isNull())).thenReturn(Single.error(new Exception()));
 
         presenter.takeView(mockView);
 
         verify(mockView).showProgress();
-        verify(mockRepo).getLinks(isNull()); // first interaction will have null as last name
+        verify(mockRepo).getPopularFromLastDay(isNull()); // first interaction will have null as last name
         verify(mockView).showError(eq(R.string.error_loading_data));
         verify(mockView).hideProgress();
     }
 
     @Test
     public void takeView_success_shouldShowData() {
-        when(mockRepo.getLinks(isNull())).thenReturn(Single.fromCallable(() -> Collections.singletonList(link)));
+        when(mockRepo.getPopularFromLastDay(isNull())).thenReturn(Single.fromCallable(() -> Collections.singletonList(link)));
 
         presenter.takeView(mockView);
 
         verify(mockView).showProgress();
-        verify(mockRepo).getLinks(isNull()); // first interaction will have null as last name
+        verify(mockRepo).getPopularFromLastDay(isNull()); // first interaction will have null as last name
         verify(mockView).hideProgress();
         verify(mockView).showData(ArgumentMatchers.anyList());
     }
