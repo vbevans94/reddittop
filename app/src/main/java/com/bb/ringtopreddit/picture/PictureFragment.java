@@ -1,6 +1,7 @@
 package com.bb.ringtopreddit.picture;
 
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,9 +13,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.bb.ringtopreddit.R;
 import com.bb.ringtopreddit.data.model.Picture;
+import com.bb.ringtopreddit.utils.PermissionsManager;
 import com.bumptech.glide.Glide;
 
 import javax.inject.Inject;
@@ -33,6 +36,9 @@ public class PictureFragment extends Fragment implements PictureContract.View {
 
     @Inject
     PictureContract.Presenter presenter;
+
+    @Inject
+    PermissionsManager permissionsManager;
 
     private Unbinder unbinder;
     private Picture picture;
@@ -76,6 +82,20 @@ public class PictureFragment extends Fragment implements PictureContract.View {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+
+        presenter.takeView(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        presenter.dropView();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
 
@@ -85,10 +105,40 @@ public class PictureFragment extends Fragment implements PictureContract.View {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_save) {
-            presenter.onSavePicture(picture);
+            savePicture();
+
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void savePicture() {
+        presenter.onSavePicture(((BitmapDrawable) imagePicture.getDrawable()).getBitmap(), picture);
+    }
+
+    @Override
+    public void showMessage(int messageResId) {
+        Toast.makeText(getContext(), messageResId, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void requestWritePermission() {
+        permissionsManager.requestWriteExternalStoragePermissions(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PermissionsManager.REQUEST_WRITE_EXTERNAL_STORAGE:
+                if (permissionsManager.permissionGranted(grantResults)) {
+                    savePicture();
+                } else {
+                    Toast.makeText(getContext(), R.string.error_save_picture_failed, Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     @Override

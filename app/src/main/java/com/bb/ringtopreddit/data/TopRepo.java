@@ -6,6 +6,7 @@ import com.bb.ringtopreddit.R;
 import com.bb.ringtopreddit.data.ApiService;
 import com.bb.ringtopreddit.data.model.LinkItem;
 import com.bb.ringtopreddit.data.model.Listing;
+import com.bb.ringtopreddit.data.model.Preview;
 import com.bb.ringtopreddit.data.model.RedditLink;
 import com.bb.ringtopreddit.utils.Names;
 
@@ -50,6 +51,11 @@ public class TopRepo {
                     int hours = (int) TimeUnit.MILLISECONDS.toHours(now.getTimeInMillis() - createdAtMillisUtc);
 
                     link.setHoursAgo(context.getResources().getQuantityString(R.plurals.hour_ago, hours, hours));
+
+                    Preview preview = link.getPreview();
+                    if (preview != null && preview.getImages() != null && !preview.getImages().isEmpty()) {
+                        preview.getImages().get(0).getSource().setTitle(link.getTitle());
+                    }
                 })
                 .toList();
     }

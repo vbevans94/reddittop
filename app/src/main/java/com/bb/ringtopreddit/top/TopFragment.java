@@ -70,7 +70,7 @@ public class TopFragment extends Fragment implements TopContract.View, LinksAdap
         listLinks.setLayoutManager(layoutManager);
         listLinks.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
-            static final int THRESHOLD = 5;
+            static final int THRESHOLD = 1;
 
             int firstVisibleItem;
             int visibleItemCount;
