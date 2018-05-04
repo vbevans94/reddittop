@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">RingTopReddit</string>
+    <string name="n_comments">%d comments</string>
+    <string name="by_author">by %s</string>
+    <string name="title_popular">Popular</string>
+    <string name="action_save">Save</string>
+    <string name="description_picture_of_reddit">Picture of reddit</string>
+    <string name="error_no_picture">No picture for given item</string>
+    <string name="error_loading_data">Failed to load data.</string>
+
+    <plurals name="hour_ago">
+        <item quantity="one">%d hour ago</item>
+        <item quantity="other">%d hours ago</item>
+    </plurals>
+</resources>
