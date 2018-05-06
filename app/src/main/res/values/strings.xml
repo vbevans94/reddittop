@@ -9,6 +9,7 @@
     <string name="error_loading_data">Failed to load data.</string>
     <string name="message_saved">Saved</string>
     <string name="error_save_picture_failed">Unable to save picture</string>
+    <string name="message_loading">Loading…</string>
 
     <plurals name="hour_ago">
         <item quantity="one">%d hour ago</item>

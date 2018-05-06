@@ -31,15 +31,29 @@ public class TopFragment extends Fragment implements TopContract.View, LinksAdap
     @Inject
     TopContract.Presenter presenter;
 
-    @BindView(R.id.progress_bar)
-    View progressBar;
-
     @BindView(R.id.list_links)
     RecyclerView listLinks;
 
     private Unbinder unbinder;
     private LinksAdapter adapter;
     private LinearLayoutManager layoutManager;
+    private boolean isLoading = true;
+    private RecyclerView.OnScrollListener pagingListener = new RecyclerView.OnScrollListener() {
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            int visibleItemCount = layoutManager.getChildCount();
+            int totalItemCount = layoutManager.getItemCount();
+            int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+
+            if (!isLoading && !presenter.isLastPage()) {
+                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                        && firstVisibleItemPosition >= 0) {
+                    presenter.loadMore();
+                }
+            }
+        }
+    };
 
     public static Fragment create() {
         return new TopFragment();
@@ -68,38 +82,7 @@ public class TopFragment extends Fragment implements TopContract.View, LinksAdap
         listLinks.setAdapter(adapter);
         layoutManager = new LinearLayoutManager(context);
         listLinks.setLayoutManager(layoutManager);
-        listLinks.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            static final int THRESHOLD = 1;
-
-            int firstVisibleItem;
-            int visibleItemCount;
-            int totalItemCount;
-            int previousTotal;
-            boolean loading = true;
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0) {
-                    visibleItemCount = listLinks.getChildCount();
-                    totalItemCount = layoutManager.getItemCount();
-                    firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
-
-                    if (loading) {
-                        if (totalItemCount > previousTotal) {
-                            loading = false;
-                            previousTotal = totalItemCount;
-                        }
-                    }
-                    if (!loading && (totalItemCount - visibleItemCount) <= (firstVisibleItem + THRESHOLD)) {
-                        presenter.loadMore();
-
-                        loading = true;
-                    }
-                }
-            }
-        });
-
+        listLinks.addOnScrollListener(pagingListener);
     }
 
     @Override
@@ -125,12 +108,16 @@ public class TopFragment extends Fragment implements TopContract.View, LinksAdap
 
     @Override
     public void showProgress() {
-        progressBar.setVisibility(View.VISIBLE);
+        adapter.setIsLoading(true);
+
+        isLoading = true;
     }
 
     @Override
     public void hideProgress() {
-        progressBar.setVisibility(View.GONE);
+        adapter.setIsLoading(false);
+
+        isLoading = false;
     }
 
     @Override

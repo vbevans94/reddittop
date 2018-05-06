@@ -7,11 +7,4 @@
         android:id="@+id/list_links"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:visibility="gone"
-        android:layout_gravity="center"
-        android:layout_width="72dp"
-        android:layout_height="72dp" />
 </FrameLayout>

@@ -45,12 +45,17 @@ public class TopPresenter implements TopContract.Presenter {
     }
 
     @Override
+    public boolean isLastPage() {
+        return loadedData.size() >= MAX_ITEMS_COUNT;
+    }
+
+    @Override
     public void loadMore() {
         if (view == null) {
             return;
         }
 
-        if (loadedData.size() < MAX_ITEMS_COUNT) {
+        if (!isLastPage()) {
             view.showProgress();
             disposable.add(topRepo.getPopularFromLastDay(lastName)
                     .subscribe(this::onSuccess, this::onError));

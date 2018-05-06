@@ -23,16 +23,18 @@ import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 
-import static com.bumptech.glide.request.RequestOptions.bitmapTransform;
+public class LinksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-public class LinksAdapter extends RecyclerView.Adapter<LinksAdapter.ViewHolder> {
+    private static final int TYPE_LOADING = 0;
+    private static final int TYPE_LINK = 1;
+    private static final RedditLink LOADING_PLACEHOLDER = new RedditLink();
 
     private final List<RedditLink> data = new ArrayList<>();
     private final Context context;
     private final LayoutInflater inflater;
     private final OnPictureSelectedListener listener;
+    private boolean isLoading;
 
     LinksAdapter(Context context, OnPictureSelectedListener listener) {
         this.context = context;
@@ -45,15 +47,44 @@ public class LinksAdapter extends RecyclerView.Adapter<LinksAdapter.ViewHolder> 
         notifyItemRangeInserted(getItemCount(), links.size());
     }
 
+    @Override
+    public int getItemViewType(int position) {
+        return isLoading && position == data.size() - 1 ? TYPE_LOADING : TYPE_LINK;
+    }
+
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(inflater.inflate(R.layout.item_link, parent, false));
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        switch (viewType) {
+            case TYPE_LOADING:
+                return new LoadingHolder(inflater.inflate(R.layout.item_loading, parent, false));
+
+            default:
+            case TYPE_LINK:
+                return new LinkHolder(inflater.inflate(R.layout.item_link, parent, false));
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.bind(data.get(position));
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof LinkHolder) {
+            ((LinkHolder) holder).bind(data.get(position));
+        }
+    }
+
+    public void setIsLoading(boolean loading) {
+        isLoading = loading;
+
+        if (isLoading) {
+            data.add(LOADING_PLACEHOLDER);
+            notifyItemInserted(data.size() - 1);
+        } else {
+            int position = data.indexOf(LOADING_PLACEHOLDER);
+            if (position >= 0) {
+                data.remove(position);
+                notifyItemRemoved(position);
+            }
+        }
     }
 
     @Override
@@ -61,7 +92,14 @@ public class LinksAdapter extends RecyclerView.Adapter<LinksAdapter.ViewHolder> 
         return data.size();
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder {
+    class LoadingHolder extends RecyclerView.ViewHolder {
+
+        LoadingHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
+    class LinkHolder extends RecyclerView.ViewHolder {
 
         @BindView(R.id.text_title)
         TextView textTitle;
@@ -83,7 +121,7 @@ public class LinksAdapter extends RecyclerView.Adapter<LinksAdapter.ViewHolder> 
 
         private RedditLink link;
 
-        ViewHolder(View itemView) {
+        LinkHolder(View itemView) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);

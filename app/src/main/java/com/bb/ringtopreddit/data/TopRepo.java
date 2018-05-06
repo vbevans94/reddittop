@@ -1,6 +1,7 @@
 package com.bb.ringtopreddit.data;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.bb.ringtopreddit.R;
 import com.bb.ringtopreddit.data.ApiService;
@@ -29,6 +30,8 @@ import io.reactivex.schedulers.Schedulers;
 @Singleton
 public class TopRepo {
 
+    private static final String TAG = "TopRepo";
+
     private static final String UTC_ID = "UTC";
 
     private final Context context;
@@ -41,6 +44,7 @@ public class TopRepo {
     }
 
     public Single<List<RedditLink>> getPopularFromLastDay(String lastName) {
+        Log.d(TAG, "Getting popular reddit links after " + lastName);
         return apiService.topPopular("day", lastName, 10)
                 .flatMap((Function<Listing, ObservableSource<LinkItem>>) listing -> Observable.fromIterable(listing.getData().getChildren()))
                 .map(LinkItem::getData)

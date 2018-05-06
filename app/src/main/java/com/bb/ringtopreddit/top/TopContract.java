@@ -29,5 +29,7 @@ public class TopContract {
         void onSelectPicture(Picture picture);
 
         void onNoPicture();
+
+        boolean isLastPage();
     }
 }
