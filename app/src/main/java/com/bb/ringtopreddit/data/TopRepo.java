@@ -63,8 +63,6 @@ public class TopRepo {
                         preview.getImages().get(0).getSource().setTitle(link.getTitle());
                     }
                 })
-                .toList()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
+                .toList();
     }
 }

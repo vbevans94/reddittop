@@ -14,7 +14,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
 
 @Singleton
 public class TopPresenter implements TopContract.Presenter {
@@ -44,6 +46,11 @@ public class TopPresenter implements TopContract.Presenter {
         }
     }
 
+    @VisibleForTesting
+    void setView(TopContract.View view) {
+        this.view = view;
+    }
+
     @Override
     public boolean isLastPage() {
         return loadedData.size() >= MAX_ITEMS_COUNT;
@@ -58,6 +65,8 @@ public class TopPresenter implements TopContract.Presenter {
         if (!isLastPage()) {
             view.showProgress();
             disposable.add(topRepo.getPopularFromLastDay(lastName)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(this::onSuccess, this::onError));
         }
     }
@@ -66,6 +75,7 @@ public class TopPresenter implements TopContract.Presenter {
     void onSuccess(List<RedditLink> data) {
         Log.d(TAG, "Received links: " + data.size());
         loadedData.addAll(data);
+        lastName = data.get(data.size() - 1).getName();
 
         if (view == null) {
             return;
@@ -73,8 +83,6 @@ public class TopPresenter implements TopContract.Presenter {
 
         view.hideProgress();
         view.showData(data);
-
-        lastName = data.get(data.size() - 1).getName();
     }
 
     @VisibleForTesting
