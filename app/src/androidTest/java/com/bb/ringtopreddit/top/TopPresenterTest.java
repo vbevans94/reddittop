@@ -51,6 +51,7 @@ public class TopPresenterTest {
         presenter.takeView(mockView);
 
         verify(mockView).showData(ArgumentMatchers.anyList());
+        verify(mockView).hideProgress();
         verifyNoMoreInteractions(mockRepo, mockView);
     }
 

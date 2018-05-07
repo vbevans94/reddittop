@@ -42,8 +42,13 @@ public class TopPresenter implements TopContract.Presenter {
         if (loadedData.isEmpty()) {
             loadMore();
         } else {
-            view.showData(loadedData);
+            showData(loadedData);
         }
+    }
+
+    private void showData(List<RedditLink> data) {
+        view.hideProgress();
+        view.showData(data);
     }
 
     @VisibleForTesting
@@ -81,8 +86,7 @@ public class TopPresenter implements TopContract.Presenter {
             return;
         }
 
-        view.hideProgress();
-        view.showData(data);
+        showData(data);
     }
 
     @VisibleForTesting
