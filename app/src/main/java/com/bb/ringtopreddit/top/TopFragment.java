@@ -121,13 +121,23 @@ public class TopFragment extends Fragment implements TopContract.View, LinksAdap
     }
 
     @Override
+    public int getItemCount() {
+        return adapter.getItemCount();
+    }
+
+    @Override
     public void showError(int errorResId) {
         Toast.makeText(getContext(), errorResId, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void showData(List<RedditLink> links) {
-        adapter.addData(links);
+        adapter.replaceData(links);
+    }
+
+    @Override
+    public void appendData(List<RedditLink> data) {
+        adapter.addData(data);
     }
 
     @Override

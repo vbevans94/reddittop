@@ -20,6 +20,10 @@ public class TopContract {
         void showData(List<RedditLink> links);
 
         void openPictureActivity(Picture picture);
+
+        int getItemCount();
+
+        void appendData(List<RedditLink> data);
     }
 
     public interface Presenter extends BasePresenter<View> {

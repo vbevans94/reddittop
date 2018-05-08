@@ -29,6 +29,7 @@ public class TopPresenter implements TopContract.Presenter {
     private final List<RedditLink> loadedData = new ArrayList<>();
     private TopContract.View view;
     private String lastName = null;
+    private boolean loading;
 
     @Inject
     TopPresenter(TopRepo topRepo) {
@@ -41,19 +42,21 @@ public class TopPresenter implements TopContract.Presenter {
 
         if (loadedData.isEmpty()) {
             loadMore();
-        } else {
-            showData(loadedData);
+        } else if (view.getItemCount() == 0) {
+            view.hideProgress();
+            view.showData(loadedData);
         }
-    }
-
-    private void showData(List<RedditLink> data) {
-        view.hideProgress();
-        view.showData(data);
     }
 
     @VisibleForTesting
     void setView(TopContract.View view) {
         this.view = view;
+    }
+
+    @VisibleForTesting
+    void setLoadedData(List<RedditLink> loadedData) {
+        this.loadedData.clear();
+        this.loadedData.addAll(loadedData);
     }
 
     @Override
@@ -67,7 +70,8 @@ public class TopPresenter implements TopContract.Presenter {
             return;
         }
 
-        if (!isLastPage()) {
+        if (!loading && !isLastPage()) {
+            loading = true;
             view.showProgress();
             disposable.add(topRepo.getPopularFromLastDay(lastName)
                     .subscribeOn(Schedulers.io())
@@ -81,17 +85,20 @@ public class TopPresenter implements TopContract.Presenter {
         Log.d(TAG, "Received links: " + data.size());
         loadedData.addAll(data);
         lastName = data.get(data.size() - 1).getName();
+        loading = false;
 
         if (view == null) {
             return;
         }
 
-        showData(data);
+        view.hideProgress();
+        view.appendData(data);
     }
 
     @VisibleForTesting
     void onError(Throwable error) {
         Log.e(TAG, "Failed to load items", error);
+        loading = false;
 
         if (view == null) {
             return;

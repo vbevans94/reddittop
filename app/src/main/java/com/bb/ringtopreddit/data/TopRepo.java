@@ -4,30 +4,21 @@ import android.content.Context;
 import android.util.Log;
 
 import com.bb.ringtopreddit.R;
-import com.bb.ringtopreddit.data.ApiService;
 import com.bb.ringtopreddit.data.model.LinkItem;
 import com.bb.ringtopreddit.data.model.Listing;
 import com.bb.ringtopreddit.data.model.Preview;
 import com.bb.ringtopreddit.data.model.RedditLink;
-import com.bb.ringtopreddit.utils.Names;
 
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
 import io.reactivex.Single;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
-import io.reactivex.schedulers.Schedulers;
 
-@Singleton
 public class TopRepo {
 
     private static final String TAG = "TopRepo";
@@ -37,8 +28,7 @@ public class TopRepo {
     private final Context context;
     private final ApiService apiService;
 
-    @Inject
-    TopRepo(@Named(Names.APPLICATION) Context context, ApiService apiService) {
+    TopRepo(Context context, ApiService apiService) {
         this.context = context;
         this.apiService = apiService;
     }

@@ -47,6 +47,28 @@ public class LinksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemRangeInserted(getItemCount(), links.size());
     }
 
+    public void replaceData(List<RedditLink> links) {
+        data.clear();
+        data.addAll(links);
+
+        notifyDataSetChanged();
+    }
+
+    public void setIsLoading(boolean loading) {
+        isLoading = loading;
+
+        if (isLoading) {
+            data.add(LOADING_PLACEHOLDER);
+            notifyItemInserted(data.size() - 1);
+        } else {
+            int position = data.indexOf(LOADING_PLACEHOLDER);
+            if (position >= 0) {
+                data.remove(position);
+                notifyItemRemoved(position);
+            }
+        }
+    }
+
     @Override
     public int getItemViewType(int position) {
         return isLoading && position == data.size() - 1 ? TYPE_LOADING : TYPE_LINK;
@@ -69,21 +91,6 @@ public class LinksAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof LinkHolder) {
             ((LinkHolder) holder).bind(data.get(position));
-        }
-    }
-
-    public void setIsLoading(boolean loading) {
-        isLoading = loading;
-
-        if (isLoading) {
-            data.add(LOADING_PLACEHOLDER);
-            notifyItemInserted(data.size() - 1);
-        } else {
-            int position = data.indexOf(LOADING_PLACEHOLDER);
-            if (position >= 0) {
-                data.remove(position);
-                notifyItemRemoved(position);
-            }
         }
     }
 
