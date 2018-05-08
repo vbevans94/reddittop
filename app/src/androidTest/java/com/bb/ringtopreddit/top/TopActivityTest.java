@@ -4,11 +4,14 @@ import android.app.Application;
 import android.app.Instrumentation;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.annotation.UiThreadTest;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import com.bb.ringtopreddit.DaggerFakeAppComponent;
 import com.bb.ringtopreddit.FakeTopRepoModule;
@@ -22,9 +25,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -40,66 +43,82 @@ import static org.mockito.Mockito.when;
 @LargeTest
 public class TopActivityTest {
 
+    private static final String TAG = "TopTest";
+
     @Rule
     public ActivityTestRule<TopActivity> activityRule = new ActivityTestRule<>(TopActivity.class, false, false);
-    private final AtomicInteger counter = new AtomicInteger();
-    private TopRepo mockRepo;
-    private Context context;
+    private final Handler handler = new Handler(Looper.getMainLooper());
+
+    private final AtomicInteger linkCounter = new AtomicInteger();
+    private Single<List<RedditLink>> linksSingle;
+
     private Instrumentation instrumentation;
     private TopActivity activity;
+    private TopFragment fragment;
 
     @Before
     public void setUp() {
         instrumentation = InstrumentationRegistry.getInstrumentation();
-        context = InstrumentationRegistry.getTargetContext().getApplicationContext();
-        mockRepo = createFakeRepo();
+
+        // inject test component
+        Context context = InstrumentationRegistry.getTargetContext().getApplicationContext();
+        TopRepo mockRepo = createFakeRepo();
         DaggerFakeAppComponent.builder()
                 .fakeTopRepoModule(new FakeTopRepoModule(mockRepo))
                 .appModule(new AppModule((Application) context))
                 .build().inject((TopApp) context);
 
+        // start activity
         activityRule.launchActivity(new Intent(context, TopActivity.class));
         activity = activityRule.getActivity();
-
-        TopFragment fragment = (TopFragment) activity.getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        TopPresenter presenter = (TopPresenter) fragment.presenter;
-        presenter.setLoadedData(Collections.emptyList());
+        fragment = (TopFragment) activity.getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     }
 
     private TopRepo createFakeRepo() {
         TopRepo mockRepo = mock(TopRepo.class);
+
+        linksSingle = Single.just(producePageOfLinks());
+
+        when(mockRepo.getPopularFromLastDay(anyString())).then((Answer<Single<List<RedditLink>>>) invocation -> linksSingle);
+        when(mockRepo.getPopularFromLastDay(isNull())).then((Answer<Single<List<RedditLink>>>) invocation -> linksSingle);
+
+        return mockRepo;
+    }
+
+    private List<RedditLink> producePageOfLinks() {
+        Log.d(TAG, "Produce");
         List<RedditLink> redditLinks = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            redditLinks.add(new RedditLink("name" + counter.incrementAndGet(), "author", "title", "https://www.google.com/favicon.ico", 10, System.currentTimeMillis() / 1000, null));
+            redditLinks.add(new RedditLink("name" + linkCounter.incrementAndGet(), "author",
+                    "title", "https://www.google.com/favicon.ico", 10, System.currentTimeMillis() / 1000, null));
         }
-
-        Single<List<RedditLink>> single = Single.just(redditLinks)
-//                .delay(3, TimeUnit.SECONDS)
-                ;
-        when(mockRepo.getPopularFromLastDay(anyString())).thenReturn(single);
-        when(mockRepo.getPopularFromLastDay(isNull())).thenReturn(single);
-        return mockRepo;
+        return redditLinks;
     }
 
     @Test
     @UiThreadTest
     public void loadData_stopStart_notLoadedTwice() {
-        instrumentation.callActivityOnStop(activity);
-        instrumentation.callActivityOnStart(activity);
-
-        instrumentation.callActivityOnStop(activity);
-        instrumentation.callActivityOnStart(activity);
-
-        TopFragment fragment = (TopFragment) activity.getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         assertEquals(10, fragment.getItemCount());
+
+        instrumentation.callActivityOnStop(activity);
+        instrumentation.callActivityOnStart(activity);
+
+        handler.post(() -> assertEquals(10, fragment.getItemCount()));
     }
 
     @Test
     @UiThreadTest
-    public void loadData_restarted_notLoadedTwice() {
-        instrumentation.callActivityOnRestart(activity);
-
-        TopFragment fragment = (TopFragment) activity.getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+    public void loadData_stopDataCameStart_notLoadedTwice() throws Exception {
         assertEquals(10, fragment.getItemCount());
+
+        fragment.presenter.loadMore();
+
+        instrumentation.callActivityOnStop(activity);
+
+        // postpone start to be done after received
+        handler.post(() -> {
+            instrumentation.callActivityOnStart(activity);
+            assertEquals(20, fragment.getItemCount());
+        });
     }
 }

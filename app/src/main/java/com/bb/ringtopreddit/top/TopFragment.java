@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,8 @@ import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 
 public class TopFragment extends Fragment implements TopContract.View, LinksAdapter.OnPictureSelectedListener {
+
+    private static final String TAG = "TopFragment";
 
     @Inject
     TopContract.Presenter presenter;
@@ -49,6 +52,7 @@ public class TopFragment extends Fragment implements TopContract.View, LinksAdap
             if (!isLoading && !presenter.isLastPage()) {
                 if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0) {
+                    Log.d(TAG, "Scrolled to bottom, load more");
                     presenter.loadMore();
                 }
             }
