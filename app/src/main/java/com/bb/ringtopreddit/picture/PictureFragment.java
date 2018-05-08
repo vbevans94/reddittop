@@ -113,7 +113,9 @@ public class PictureFragment extends Fragment implements PictureContract.View {
     }
 
     private void savePicture() {
-        presenter.onSavePicture(((BitmapDrawable) imagePicture.getDrawable()).getBitmap(), picture);
+        if (imagePicture.getDrawable() != null) {
+            presenter.onSavePicture(((BitmapDrawable) imagePicture.getDrawable()).getBitmap(), picture);
+        }
     }
 
     @Override
