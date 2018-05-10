@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,6 +37,9 @@ public class TopFragment extends Fragment implements TopContract.View, LinksAdap
 
     @BindView(R.id.list_links)
     RecyclerView listLinks;
+
+    @BindView(R.id.container)
+    View rootView;
 
     private Unbinder unbinder;
     private LinksAdapter adapter;
@@ -131,7 +135,10 @@ public class TopFragment extends Fragment implements TopContract.View, LinksAdap
 
     @Override
     public void showError(int errorResId) {
-        Toast.makeText(getContext(), errorResId, Toast.LENGTH_SHORT).show();
+        Snackbar.make(rootView, errorResId, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.action_retry, v -> {
+                    presenter.loadMore();
+                }).show();
     }
 
     @Override

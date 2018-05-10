@@ -21,7 +21,5 @@ public interface AppComponent {
 
     void inject(TopApp app);
 
-    TopRepo topRepo();
-
     TopScreenComponent.Builder topScreenComponent();
 }

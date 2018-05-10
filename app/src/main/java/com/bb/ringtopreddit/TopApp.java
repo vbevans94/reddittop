@@ -2,6 +2,7 @@ package com.bb.ringtopreddit;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.app.Fragment;
 
 import com.bb.ringtopreddit.di.AppComponent;
@@ -26,9 +27,14 @@ public class TopApp extends Application implements HasSupportFragmentInjector {
     public void onCreate() {
         super.onCreate();
 
-        appComponent = DaggerAppComponent.builder()
+        setAppComponent(DaggerAppComponent.builder()
                 .appModule(new AppModule(this))
-                .build();
+                .build());
+    }
+
+    @VisibleForTesting
+    public void setAppComponent(AppComponent appComponent) {
+        this.appComponent = appComponent;
         appComponent.inject(this);
     }
 

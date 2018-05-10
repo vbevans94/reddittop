@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.UiThread;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.annotation.UiThreadTest;
 import android.support.test.filters.LargeTest;
@@ -14,6 +15,7 @@ import android.support.test.runner.AndroidJUnit4;
 import android.util.Log;
 
 import com.bb.ringtopreddit.DaggerFakeAppComponent;
+import com.bb.ringtopreddit.FakeAppComponent;
 import com.bb.ringtopreddit.FakeTopRepoModule;
 import com.bb.ringtopreddit.R;
 import com.bb.ringtopreddit.TopApp;
@@ -61,15 +63,15 @@ public class TopActivityTest {
         instrumentation = InstrumentationRegistry.getInstrumentation();
 
         // inject test component
-        Context context = InstrumentationRegistry.getTargetContext().getApplicationContext();
+        TopApp app = (TopApp) InstrumentationRegistry.getTargetContext().getApplicationContext();
         TopRepo mockRepo = createFakeRepo();
-        DaggerFakeAppComponent.builder()
+        app.setAppComponent(DaggerFakeAppComponent.builder()
                 .fakeTopRepoModule(new FakeTopRepoModule(mockRepo))
-                .appModule(new AppModule((Application) context))
-                .build().inject((TopApp) context);
+                .appModule(new AppModule(app))
+                .build());
 
         // start activity
-        activityRule.launchActivity(new Intent(context, TopActivity.class));
+        activityRule.launchActivity(new Intent(app, TopActivity.class));
         activity = activityRule.getActivity();
         fragment = (TopFragment) activity.getSupportFragmentManager().findFragmentById(R.id.fragment_container);
     }
@@ -108,9 +110,7 @@ public class TopActivityTest {
 
     @Test
     @UiThreadTest
-    public void loadData_stopDataCameStart_notLoadedTwice() throws Exception {
-        assertEquals(10, fragment.getItemCount());
-
+    public void loadData_stopDataCameStart_resultNotLost() {
         fragment.presenter.loadMore();
 
         instrumentation.callActivityOnStop(activity);

@@ -1,8 +1,7 @@
 package com.bb.ringtopreddit.top;
 
-import android.content.Context;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.bb.ringtopreddit.R;
 import com.bb.ringtopreddit.TopApp;
