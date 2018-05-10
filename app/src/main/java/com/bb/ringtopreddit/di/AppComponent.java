@@ -20,4 +20,8 @@ public interface AppComponent {
     Context application();
 
     void inject(TopApp app);
+
+    TopRepo topRepo();
+
+    TopScreenComponent.Builder topScreenComponent();
 }

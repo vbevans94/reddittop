@@ -7,19 +7,19 @@ import com.bb.ringtopreddit.R;
 import com.bb.ringtopreddit.data.model.Picture;
 import com.bb.ringtopreddit.data.model.RedditLink;
 import com.bb.ringtopreddit.data.TopRepo;
+import com.bb.ringtopreddit.di.ScreenScope;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 
-@Singleton
+@ScreenScope
 public class TopPresenter implements TopContract.Presenter {
 
     private static final String TAG = "TopPresenter";

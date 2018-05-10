@@ -2,14 +2,13 @@ package com.bb.ringtopreddit.picture;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.bb.ringtopreddit.R;
 import com.bb.ringtopreddit.data.model.Picture;
-import com.bb.ringtopreddit.top.TopFragment;
 
 public class PictureActivity extends AppCompatActivity {
 

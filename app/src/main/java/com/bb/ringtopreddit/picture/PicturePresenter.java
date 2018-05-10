@@ -4,16 +4,16 @@ import android.graphics.Bitmap;
 
 import com.bb.ringtopreddit.R;
 import com.bb.ringtopreddit.data.model.Picture;
+import com.bb.ringtopreddit.di.ActivityScope;
+import com.bb.ringtopreddit.di.ScreenScope;
 import com.bb.ringtopreddit.utils.ImageSaver;
 import com.bb.ringtopreddit.utils.PermissionsManager;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-@Singleton
+@ActivityScope
 public class PicturePresenter implements PictureContract.Presenter {
-
-    private static final String TAG = "PicturePresenter";
 
     private final ImageSaver imageSaver;
     private final PermissionsManager permissionsManager;

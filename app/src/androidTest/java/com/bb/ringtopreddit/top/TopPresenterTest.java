@@ -61,7 +61,7 @@ public class TopPresenterTest {
         presenter.onSuccess(Collections.singletonList(REDDIT_LINK));
 
         verify(mockView).hideProgress();
-        verify(mockView).showData(ArgumentMatchers.anyList());
+        verify(mockView).appendData(ArgumentMatchers.anyList());
     }
 
     @Test
